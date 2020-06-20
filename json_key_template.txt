@@ -1,0 +1,18 @@
+Construct two json files as shown below.
+Add in your keys.
+
+1. config.json
+
+{
+    "SECRET_KEY": "your flask app key"
+}
+
+2. api_keys.json
+
+{
+    "client_id": "",
+    "client_secret": "",
+    "refresh_token": "",
+    "gmaps_key": ""
+}
+

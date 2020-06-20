@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        
+        <style>
+
+            #map {
+                height: 700px;  /* The height is 400 pixels */
+                width: 80%;  /* The width is the width of the web page */
+                margin-left: auto;
+                margin-right: auto;
+
+            }
+            
+            html, body {
+              height: 100%;
+              margin: 0;
+              padding: 0;
+            }
+          </style>
+      
+
+        <title>Ride Generator</title>
+      </head>
+
+  <body>
+
+      <div>
+          <div class = 'container' style="margin-top: 10px">
+            <form method="POST" action="">
+                    {{ form.hidden_tag()}}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4 ml-5 mt-5">Let's Generate a Ride </legend>
+
+                        <div class="form-row pb-3">
+                            <div class="col-xs-2">
+                               {{form.southwest(class="form-control form-control-lg ml-5 pr-3", id="southwest")}}
+                            </div>
+                            <div class="col-xs-2">
+                               {{form.northeast(class="form-control form-control-lg ml-5", id="northeast")}}
+                            </div>
+                            <div class="col-xs-2">
+                               {{form.home(class="form-control form-control-lg ml-5", id="home")}}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-xs-2">
+                                {{form.distance.label(class="form-control-label ml-5")}}
+                                {{form.distance(class="form-control form-control-lg ml-5")}}
+                            </div>
+                        </div>
+                </fieldset>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary ml-5 mb-4")}}
+              </form>
+
+
+                </div>
+
+                <div class="row mb-5">
+                  <!-- panel-footer -->
+                  <div class="col-6 text-left">
+                    <div id="floating-panel">
+                      <input class="btn btn-secondary ml-5" type="button" value="Add Route Area" onclick="addOverlay();"></input>
+                      
+                  </div>
+                  </div>
+                  <div class="col-6 text-right">
+                      <div class="btn-group mr-2" >
+                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModalScrollable">
+                          About
+                        </button>
+                      </div>
+                  </div>
+              </div>
+        
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalScrollableTitle">About</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>
+                  To run, select your starting location by clicking on the map.Next, select <b>Add Route Area</b>.
+                  Adjust the rectangle to the desired riding area. Select your ideal route size and generate!
+                </p>
+              
+                <p>
+                  Ride generator gives preference to identified circuitous routes over closeness to desired ride length. 
+                </p>
+
+                <p>
+                  Elevation approximations are limited to the googlemaps elevation api restrictions. A single route may only be split 512 times. 
+                  As such, gain and elevation approximations are likely under true elevation. 
+                </p>
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+      
+
+        </div>
+        {% if context.dist %}
+        <div class="container mb-5 ml-4">
+          <h4>Generated Ride Distance: {{ context.dist|round }} miles</h4>
+        </div>
+        <div class="container mb-5 ml-4">
+          <h4>Approximate Elevation Gain: {{ context.gain|round }} feet</h4>
+        </div>
+
+        <div id="plot" style="width:100%;height:250px;"></div>
+
+        {% endif %}
+        
+        {% if context.none %}
+          <div class="container mb-5 ml-4">
+            <h4> {{context.none}} </h4>
+          </div>
+        {% endif %}
+         
+
+         <div id="map"></div>
+
+         {% if context.directions %}
+         <div class="container mb-5 mt-5 ml-4">
+           {% for i in context.directions %}
+             <li>{{ i|safe }}</li>
+             
+           {% endfor %}
+     
+         </div>
+         {% endif %}
+
+      </div>
+
+
+    <script>
+        var map;
+        var rectangle;
+        var infoWindow;
+
+  
+        function initMap() {
+          map = new google.maps.Map(document.getElementById('map'), {
+            {% if context.center_lat %}
+              center: {lat: Number("{{context.center_lat}}"), lng: Number("{{context.center_lng}}")}, //pass map center to here on route
+            {% else %}
+              center: {lat: 42.28, lng: -72.73}, //pass map center to here on route
+            {% endif %}
+            zoom: 9
+          });
+
+          {% if context.center_lat %}
+          console.log("lng")
+              console.log(typeof "{{context.center_lng}}")
+
+              console.log("lat")
+              console.log("{{context.center_lat|float}}")
+            {% else %}
+            console.log("test")
+            {% endif %}
+    rectangle = new google.maps.Rectangle();
+    
+
+    rectangle.addListener('bounds_changed', function(){
+        var ne = rectangle.getBounds().getNorthEast();
+        var sw = rectangle.getBounds().getSouthWest();
+        document.getElementById("southwest").value = sw;
+        document.getElementById("northeast").value = ne;
+    });
+
+    var rect = map.addListener('idle', function() {
+
+            var center =  map.getCenter();
+            var ea = center.lng()+.1;
+            var we = center.lng();
+            var no = center.lat()+.1;
+            var so = center.lat();
+
+        // Get the current bounds, which reflect the bounds before the zoom.
+        rectangle.setOptions({
+            strokeColor: '#00274c',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#00274c',
+            fillOpacity: 0.35,
+            editable: true,
+            draggable: true,
+            map: null,
+            bounds: {
+                north: no,
+                east: ea,
+                south: so,
+                west: we
+                }
+        });
+
+
+        });
+
+
+        map.addListener('click', function(e) {
+
+                placeMarker(e.latLng, map);
+            });
+
+  
+
+          infoWindow = new google.maps.InfoWindow();
+
+        {% if context.points %}
+        
+        console.log('points!')
+        var rideRouteCoordinates = "{{context.points}}";
+      
+        var ridePath = new google.maps.Polyline({
+          path: google.maps.geometry.encoding.decodePath(rideRouteCoordinates),
+          geodesic: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 1.0,
+          strokeWeight: 2
+        });
+
+        ridePath.setMap(map);
+        {% endif %}
+
+
+        
+        //start ride marker (green)
+
+        {% if context.start_lat %}
+
+        var myLatLng = {lat: Number("{{context.start_lat}}"), lng: Number("{{context.start_lng}}")};
+        var marker2 = new google.maps.Marker({
+            icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+            position: myLatLng,
+            map: map,
+          });
+
+        {% endif %}
+
+
+
+
+        }
+
+        function addOverlay() {
+
+          console.log(rectangle);
+          rectangle.setOptions({map:map});
+
+        }
+
+        function removeOverlay() {
+          console.log(rectangle);
+          rectangle.setOptions({map:null});
+  
+        }
+
+
+        // Show the new coordinates for the rectangle in an info window.
+
+        function showNewRect(event) {
+          var ne = rectangle.getBounds().getNorthEast();
+          var sw = rectangle.getBounds().getSouthWest();
+  
+          var contentString = '<b>Rectangle moved.</b><br>' +
+              'New north-east corner: ' + ne.lat() + ', ' + ne.lng() + '<br>' +
+              'New south-west corner: ' + sw.lat() + ', ' + sw.lng();
+            
+            document.getElementById("southwest").value = sw;
+            document.getElementById("northeast").value = ne;
+
+          infoWindow.setContent(contentString);
+          infoWindow.setPosition(ne);
+  
+          infoWindow.open(map);
+          console.log('test')
+        }
+
+
+      
+        var marker;
+
+            function placeMarker(location) {
+            if ( marker ) {
+                marker.setPosition(location);
+            } else {
+                marker = new google.maps.Marker({
+                position: location,
+                map: map
+                });
+            }
+            var home = marker.getPosition().toString() //pass to form, hidden
+            document.getElementById("home").value = home;
+            }
+
+
+
+      </script>
+
+
+
+
+      <!-- PLOT -->
+ 
+      <script>
+
+      var layout = {
+        xaxis: {
+          title: "miles",
+
+        },
+        yaxis: {
+          title:"elevation"
+        },
+        }
+
+        var config = {responsive: true,
+          displayModeBar: false
+          }
+          
+
+        PLOT = document.getElementById('plot');
+                
+        var data = [
+                      {
+                        x: JSON.parse("{{context.x}}"),
+                        y: JSON.parse("{{context.ele}}"),
+                        mode: 'line',
+                                              
+                        type: 'scatter'
+                      }
+                    ];
+
+        Plotly.newPlot(PLOT, data, layout, config);
+      </script>
+
+
+      <script 
+    src="https://maps.googleapis.com/maps/api/js?key={{context.key}}&libraries=geometry&callback=initMap"
+    async defer></script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  </body>
+</html>
+
+
