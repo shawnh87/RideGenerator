@@ -29,4 +29,19 @@ GoogleMaps Elevation data is provided as a general idea for the user. Unfortunat
 
 ## Usage
 
+#### Start Screen
+
 ![alt text](https://github.com/shawnh87/ridegenerator/blob/master/screenshots/ridegenerator.png)
+
+#### Select Bounding Box and Start Location
+
+
+![alt text](https://github.com/shawnh87/ridegenerator/blob/master/screenshots/area_selected.png)
+
+
+#### Generated Route (route directions below map image)
+
+![alt text](https://github.com/shawnh87/ridegenerator/blob/master/screenshots/generated_route.png)
+
+
+
