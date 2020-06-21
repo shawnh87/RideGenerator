@@ -4,10 +4,10 @@
 RideGenerator generates random circuitous routes on a map location of the user’s choosing. 
 
 ## Dependencies
-Google
+#### Google
 Googlemaps API key with elevation API activated (moderate usage is covered under the yearly credit provided by google). Project and keys can be found at: https://cloud.google.com/maps-platform
 
-Strava
+#### Strava
 A free Strava account to will grant a client id, access token, and refresh token:
 https://developers.strava.com/docs/getting-started/#account
 
