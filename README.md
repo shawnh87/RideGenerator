@@ -1,7 +1,6 @@
-# ridegenerator
+# RideGenerator
 
-
-RideGenerator generates random circuitous routes on a map location of the user’s choosing. 
+RideGenerator is a simple Flask app for generating random circuitous routes on a map location of the user’s choosing. 
 
 ## Dependencies
 #### Google
