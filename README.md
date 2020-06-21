@@ -1,4 +1,4 @@
-# ridegenerator
+# RideGenerator
 
 
 RideGenerator generates random circuitous routes on a map location of the user’s choosing. 
