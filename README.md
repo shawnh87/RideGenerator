@@ -13,10 +13,12 @@ https://developers.strava.com/docs/getting-started/#account
 
 ## Runtime
 Python 3.8
+See requirements.txt
 
 ## Additional Files
 Construct config.json and api_keys.json as defined in json_key_template.txt
 
+## Details
 RideGenerator works by locating popular Strava ride segments within a user submitted bounding box. Of the segments returned by Strava, two segments are selected such that the ability to create a circuitous route is maximized. Starting at a home location, routes are constructed by the GoogleMaps Directions API between various waypoints. In addition to the waypoints at the beginning and end of Strava segments, waypoints are generated to coerce a circuitous path. This is done by creating  points at a 45 degree angle between the vector spanning the end and beginning of Strava segments. In practice this technique works fairly well. 
 
 The application is limited by Strava activity in the user’s locality. In other words, if a user selects a bounding box with zero Strava segments returned, there will not be a route generated.
