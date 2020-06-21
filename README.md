@@ -24,5 +24,23 @@ The application is limited by Strava activity in the user’s locality. In other
 
 RideGenerator users provide a target mileage. The application attempts create a route as close to that target as possible while placing preference on routes that circuitous. Circuitous is defined as limited backtracking with the exception of returning to the the start location. Because the key dependency is GoogleMaps, routes are often returned with imperfect characteristics, namely backtracking. No method for erasing such ‘lines’ has been identified. However, for a quick idea of a route in a new location, the RideGenerator is a great tool for cyclists.
 
-GoogleMaps Elevation data is provided as a general idea for the user. Unfortunately the Elevation API is limited to slicing a route up into a maximum of 512 points for elevation measure. As a result the longer the ride generated, the less accurate the elevation will be. View elevation data as a lower bound.
+GoogleMaps Elevation data is provided as a general idea for the user. Unfortunately the Elevation API is limited to slicing a route up into a maximum of 512 points for elevation measure. As a result the longer the ride generated, the less accurate the elevation will be. View elevation data as a lower bound of true elevation.
+
+## Usage
+
+#### Start Screen:
+
+![alt text](https://github.com/shawnh87/ridegenerator/blob/master/screenshots/ridegenerator.png)
+
+#### Select Bounding Box and Start Location:
+
+
+![alt text](https://github.com/shawnh87/ridegenerator/blob/master/screenshots/area_selected.png)
+
+
+#### Generated Route (route directions below map image):
+
+![alt text](https://github.com/shawnh87/ridegenerator/blob/master/screenshots/generated_route.png)
+
+
 
