@@ -27,3 +27,6 @@ RideGenerator users provide a target mileage. The application attempts create a 
 
 GoogleMaps Elevation data is provided as a general idea for the user. Unfortunately the Elevation API is limited to slicing a route up into a maximum of 512 points for elevation measure. As a result the longer the ride generated, the less accurate the elevation will be. View elevation data as a lower bound.
 
+## Usage
+
+![alt text](https://github.com/shawnh87/ridegenerator/blob/master/screenshots/ridegenerator.png)
