@@ -1,7 +1,7 @@
 # ridegenerator
 
 
-RideGenerator attempts to randomly create circuitous routes on a map location of the user’s choosing. 
+RideGenerator generates random circuitous routes on a map location of the user’s choosing. 
 
 ## Dependencies
 Google
