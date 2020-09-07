@@ -12,6 +12,7 @@ https://developers.strava.com/docs/getting-started/#account
 
 ## Runtime
 Python 3.8
+
 See requirements.txt
 
 ## Additional Files
